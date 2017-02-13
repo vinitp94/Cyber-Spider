@@ -1,19 +1,21 @@
 # Cyber Spider
 
-Cyber Spider is an algorithm heavy project that simulates crawling through telemetry log data from government computers in order to predict future cyberattacks. The thing that makes this project so interesting is the size of the input; we are given trillions of lines of log data, so any ordinary implementation wouldn't do. The input is in the following form:
+Cyber Spider is an algorithm heavy project that simulates crawling through telemetry log data from government computers in order to predict future cyberattacks. The thing that makes this project so interesting is the size of the input; we are given trillions of lines of log data, so any ordinary implementation wouldn't do. The input is a file with lines in the following form:
 
-{ file/website # 1, file/website # 2, relationship between # 1 and # 2 }
+- When a file F is downloaded from a website W to computer C, {C, W, F} is logged
+- When a file F creates another file G on computer C, {C, F, G} is logged
+- When a file F contacts a website W on computer C, {C, F, W} is logged
 
-Below, the technology and implementation details are covered. The spec for the project can be viewed [here][spec].
+Below, the technology and implementation details are covered. The detailed spec for the project can be viewed [here][spec].
 
 ## Technologies
 
-This project is written in pure C++. The files are split up as they typically are; headers and source.
+This program is written in pure C++. The files are split up as they typically are; headers and source.
 
 ## Implementation
 
 The two main classes written to implement this program were [DiskMultiMap][multimap] and [IntelWeb][intelweb].
-The first is in charge of storing all of the input data. Because the input was so large, all of the data had to be stored on disk using a binary file, which can be found [here][binaryfile]. To do so, I built a hashmap on disk by creating a series of buckets that all store linked lists full of data in the DiskMultiMap class. The data is stored in two different maps because the input data has two types of specified relationships between the files/websites; "to" and "from".
+The first is in charge of storing all of the input data. Because the input was so large, all of the data had to be stored on disk using a binary file, which can be found [here][binaryfile]. To do so, I built a hashmap on disk by creating a series of buckets that all store linked lists full of data in the DiskMultiMap class. Pointers cannot be used with binary files so the linked lists cannot simple hold pointers to the "next" and "previous" nodes. Instead, offsets fro the "zero" position are stored to represent location in memory, complicating the entire process. The data is stored in two different maps because the input data has two types of specified relationships between the files/websites; "to" and "from".
 
 The class that does the heavy lifting in this program is IntelWeb. This class stores all of the input data from a given file in an instance of DiskMultiMap. The functions to note here are:
 
@@ -51,7 +53,7 @@ The class that does the heavy lifting in this program is IntelWeb. This class st
 
 	while (it.isValid())
 	{
-		MultiMapTuple m = *it;
+		MultiMapTuple m = \*it;
 		string k = m.key;
 		string v = m.value;
 		string c = m.context;
@@ -65,7 +67,7 @@ The class that does the heavy lifting in this program is IntelWeb. This class st
 
 	while (it2.isValid())
 	{
-		MultiMapTuple m = *it2;
+		MultiMapTuple m = \*it2;
 		string k = m.key;
 		string v = m.value;
 		string c = m.context;
@@ -80,6 +82,17 @@ The class that does the heavy lifting in this program is IntelWeb. This class st
   ```
 
 - IntelWeb::crawl()
+
+  This is the function that actually crawls through all of the files and determines the malicious files and websites by following a set of six rules that are specified in the [spec][spec]. The function runs in O(T) time where T is the number of lines that refer to known malicious entities. The function successfully crawls through the trillions of lines of data in a few seconds. Here's a small snippet showing all the data structures that were used:
+
+  ```c++
+  unordered_map<string, DiskMultiMap::Iterator> fromIts;
+  unordered_map<string, DiskMultiMap::Iterator> toIts;
+  unordered_map<string, bool> isGood;
+  queue<string> badEntities;
+  set<string> o_BadEntities;
+  set<InteractionTuple> o_InteractionTuples;
+  ```
 
 [spec]: ./spec.pdf
 [multimap]: ./DiskMultiMap.cpp
