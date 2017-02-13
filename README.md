@@ -21,7 +21,7 @@ The class that does the heavy lifting in this program is IntelWeb. This class st
 
 - IntelWeb::ingest(string&)
 
-  This function had to read in all the data and store it in the DiskMultiMap in O(N) time
+  This function had to read in all the data and store it in the DiskMultiMap in O(N) time where N is the number of lines of data.
 
   ```c++
   while (getline(inf, line))
@@ -83,7 +83,7 @@ The class that does the heavy lifting in this program is IntelWeb. This class st
 
 - IntelWeb::crawl()
 
-  This is the function that actually crawls through all of the files and determines the malicious files and websites by following a set of six rules that are specified in the [spec][spec]. The function runs in O(T) time where T is the number of lines that refer to known malicious entities. The function successfully crawls through the trillions of lines of data in a few seconds. Here's a small snippet showing all the data structures that were used:
+  This is the function that actually crawls through all of the files and determines the malicious files and websites by following a set of six rules that are specified in the [spec][spec]. The function runs in O(T) time where T is the number of lines that refer to known malicious entities. The function successfully crawls through the trillions of lines of data in a few seconds. Here's a small snippet showing all the data structures that were used.
 
   ```c++
   unordered_map<string, DiskMultiMap::Iterator> fromIts;
