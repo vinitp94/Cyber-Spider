@@ -53,7 +53,7 @@ The class that does the heavy lifting in this program is IntelWeb. This class st
 
 	while (it.isValid())
 	{
-		MultiMapTuple m = \*it;
+		MultiMapTuple m = *it;
 		string k = m.key;
 		string v = m.value;
 		string c = m.context;
@@ -67,7 +67,7 @@ The class that does the heavy lifting in this program is IntelWeb. This class st
 
 	while (it2.isValid())
 	{
-		MultiMapTuple m = \*it2;
+		MultiMapTuple m = *it2;
 		string k = m.key;
 		string v = m.value;
 		string c = m.context;
